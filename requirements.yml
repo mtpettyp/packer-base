@@ -1,0 +1,2 @@
+- src: git+https://github.com/mtpettyp/ansible-base.git
+  version: main
