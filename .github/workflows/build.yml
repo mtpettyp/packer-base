@@ -23,25 +23,21 @@ jobs:
       - name: Install Ansible
         run:  pip install -r requirements.txt
 
+      - name: Install Packer
+        run: |
+          sudo apt-get update; sudo apt-get install -y curl gnupg software-properties-common ;
+          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add - ;
+          sudo apt-add-repository -y "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main" ;
+          sudo apt-get update && sudo apt-get install -y packer;
+
       - name: Install Plugins
-        uses: hashicorp/packer-github-actions@master
-        with:
-          command: init
-          target: image.pkr.hcl
+        run: packer init image.pkr.hcl
 
       - name: Validate Template
-        uses: hashicorp/packer-github-actions@master
-        with:
-          command: validate
-          arguments: -syntax-only
-          target: image.pkr.hcl
+        run: packer validate -syntax-only image.pkr.hcl
 
       - name: Build Artifact
-        uses: hashicorp/packer-github-actions@master
-        with:
-          command: build
-          arguments: "-color=false -on-error=abort"
-          target: image.pkr.hcl
+        run: packer build -color=false -on-error=abort image.pkr.hcl
         env:
           DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
           VAULT_PASSWORD: ${{ secrets.VAULT_PASSWORD }}
